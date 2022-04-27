@@ -2,6 +2,7 @@ From nvcr.io/nvidia/pytorch:20.09-py3
 
 Expose 6006 6007 6008 6009
 
+
 Run apt-get update && apt-get install -y \
     software-properties-common
 Run add-apt-repository universe
@@ -32,9 +33,4 @@ COPY *py /workspace/
 COPY *yaml /workspace/
 COPY utils /workspace/utils
 
-ARG USER_ID
-ARG GROUP_ID
-RUN addgroup --gid $GROUP_ID your_id
-RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID your_id
-
-USER your_id
+RUN ls

@@ -19,21 +19,20 @@ class DataLoader_back(DataLoader):
         return BackgroundGenerator(super().__iter__(),
                                    max_prefetch=self.num_workers // 4)
 
+def collate_fn(batch):
+    wav_list = list()
+    wav_l_list = list()
+    for wav, wav_l in batch:
+        wav_list.append(wav)
+        wav_l_list.append(wav_l)
+    wav_list = torch.stack(wav_list, dim=0).squeeze(1)
+    wav_l_list = torch.stack(wav_l_list, dim=0).squeeze(1)
+
+    return wav_list, wav_l_list
 
 def create_vctk_dataloader(hparams, cv):
-    def collate_fn(batch):
-        wav_list = list()
-        wav_l_list = list()
-        for wav, wav_l in batch:
-            wav_list.append(wav)
-            wav_l_list.append(wav_l)
-        wav_list = torch.stack(wav_list, dim=0).squeeze(1)
-        wav_l_list = torch.stack(wav_l_list, dim=0).squeeze(1)
-
-        return wav_list, wav_l_list
-
     if cv==0:
-        return DataLoader_back(dataset=VCTKMultiSpkDataset(hparams, cv),
+        return DataLoader_back(dataset=VCTKSingleSpkDataset(hparams, cv),
                                batch_size=hparams.train.batch_size,
                                shuffle=True,
                                num_workers=hparams.train.num_workers,
@@ -42,7 +41,7 @@ def create_vctk_dataloader(hparams, cv):
                                drop_last=True,
                                sampler=None)
     else:
-        return DataLoader_back(dataset=VCTKMultiSpkDataset(hparams, cv),
+        return DataLoader_back(dataset=VCTKSingleSpkDataset(hparams, cv),
                                collate_fn=collate_fn,
                                batch_size=hparams.train.batch_size if cv==1 else 1,
                                drop_last=True if cv==1 else False,

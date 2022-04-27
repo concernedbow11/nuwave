@@ -6,7 +6,10 @@ from glob import glob
 from tqdm import tqdm
 import multiprocessing as mp
 
+hparams = OC.load('hparameter.yaml')
+
 def wav2pt(wav):
+    
     y,_ = rosa.load(wav, sr = hparams.audio.sr, mono = True)
     y,_ = rosa.effects.trim(y, 15)
     pt_name = os.path.splitext(wav)[0]+'.pt'
@@ -16,7 +19,7 @@ def wav2pt(wav):
     return
 
 if __name__=='__main__':
-    hparams = OC.load('hparameter.yaml')
+    
     dir = hparams.data.dir
     wavs = glob(os.path.join(dir, '*/*.flac'))
     pool = mp.Pool(processes = hparams.train.num_workers)
